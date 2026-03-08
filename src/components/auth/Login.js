@@ -1,12 +1,22 @@
-import { useRef, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { loginUser } from "../../managers/AuthManager"
+import { useEffect, useRef, useState } from "react"
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import { getCurrentUserInfo, loginUser } from "../../managers/AuthManager"
+import { useCurrentUser } from "../../context/CurrentUserContext.js"
 
-export const Login = ({ setToken }) => {
+export const Login = ({}) => {
   const username = useRef()
   const password = useRef()
   const navigate = useNavigate()
-  const [isUnsuccessful, setisUnsuccessful] = useState(false)
+  const location = useLocation()
+  const loginErrorMsg = location.state
+  const [isUnsuccessful, setIsUnsuccessful] = useState(false)
+  const [showLoginNotification, setShowLoginNotification] = useState(false)
+
+  const { setUser } = useCurrentUser()
+
+  useEffect(() => {
+    if (loginErrorMsg) setShowLoginNotification(true)
+  },[loginErrorMsg])
 
   const handleLogin = (e) => {
     e.preventDefault()
@@ -16,13 +26,17 @@ export const Login = ({ setToken }) => {
       password: password.current.value
     }
 
-    loginUser(user).then(res => {
-      if ("valid" in res && res.valid) {
-        setToken(res.token)
+    loginUser(user).then((status, response) => {
+      if (status = 200) {
+        getCurrentUserInfo().then(({status, response}) => {
+          if (status === 200) {
+            setUser(response)
+          }
+        })
         navigate("/")
       }
       else {
-        setisUnsuccessful(true)
+        setIsUnsuccessful(true)
       }
     })
   }
@@ -32,6 +46,15 @@ export const Login = ({ setToken }) => {
       <form className="column is-two-thirds" onSubmit={handleLogin}>
         <h1 className="title">Rare Publishing</h1>
         <p className="subtitle">Please sign in</p>
+        {showLoginNotification && 
+          <div className="notification is-warning">
+            <button 
+              class="delete"
+              onClick={() => setShowLoginNotification(false)}
+              ></button>
+            {loginErrorMsg}
+          </div>
+        }
 
         <div className="field">
           <label className="label">Username</label>
