@@ -6,7 +6,8 @@ import { getCurrentUserInfo } from "./managers/AuthManager.js"
 import { useNavigate } from "react-router-dom"
 
 export const Rare = () => {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState()
+  const [loading, setLoading] = useState(true)
 
   const navigate = useNavigate()
 
@@ -15,16 +16,21 @@ export const Rare = () => {
       if (status === 200) {
         setUser(response)
       } else {
-        if (response.error === "no_token") return
+        if (response.error === "no_token") {
+          setUser(null)
+          return
+        }
+        setUser(null)
         navigate("/login", {state: response.message})
       }
     })
+    .finally(() => setLoading(false))
   },[])
 
   return (
   <CurrentUserContext.Provider value={{user, setUser}}>
     <NavBar />
-    <ApplicationViews />
+    <ApplicationViews loading={loading} />
   </CurrentUserContext.Provider>
   )
 }
