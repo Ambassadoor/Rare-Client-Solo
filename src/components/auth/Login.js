@@ -1,5 +1,5 @@
-import { useRef, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { getCurrentUserInfo, loginUser } from "../../managers/AuthManager"
 import { useCurrentUser } from "../../context/CurrentUserContext.js"
 
@@ -7,9 +7,16 @@ export const Login = ({}) => {
   const username = useRef()
   const password = useRef()
   const navigate = useNavigate()
+  const location = useLocation()
+  const loginErrorMsg = location.state
   const [isUnsuccessful, setIsUnsuccessful] = useState(false)
+  const [showLoginNotification, setShowLoginNotification] = useState(false)
 
   const { setUser } = useCurrentUser()
+
+  useEffect(() => {
+    if (loginErrorMsg) setShowLoginNotification(true)
+  },[loginErrorMsg])
 
   const handleLogin = (e) => {
     e.preventDefault()
@@ -39,6 +46,15 @@ export const Login = ({}) => {
       <form className="column is-two-thirds" onSubmit={handleLogin}>
         <h1 className="title">Rare Publishing</h1>
         <p className="subtitle">Please sign in</p>
+        {showLoginNotification && 
+          <div className="notification is-warning">
+            <button 
+              class="delete"
+              onClick={() => setShowLoginNotification(false)}
+              ></button>
+            {loginErrorMsg}
+          </div>
+        }
 
         <div className="field">
           <label className="label">Username</label>
