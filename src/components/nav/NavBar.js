@@ -52,6 +52,7 @@ export const NavBar = () => {
                   <button className="button is-outlined" onClick={() => {
                     logoutUser().then((status, response) => {
                       setUser(null)
+                      localStorage.removeItem("has_session")
                       if (status !== 200) {
                         console.error(response)
                       }

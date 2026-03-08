@@ -31,6 +31,7 @@ export const Login = ({}) => {
         getCurrentUserInfo().then(({status, response}) => {
           if (status === 200) {
             setUser(response)
+            localStorage.setItem("has_session", "true")
           }
         })
         navigate("/")
