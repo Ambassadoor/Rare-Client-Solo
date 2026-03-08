@@ -2,11 +2,15 @@ import { useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import "./NavBar.css"
 import Logo from "./rare.jpeg"
+import { useCurrentUser } from "../../context/CurrentUserContext.js"
+import { logoutUser } from "../../managers/AuthManager.js"
 
-export const NavBar = ({ token, setToken }) => {
+export const NavBar = () => {
   const navigate = useNavigate()
   const navbar = useRef()
   const hamburger = useRef()
+
+  const {user, setUser} = useCurrentUser()
 
   const showMobileNavbar = () => {
     hamburger.current.classList.toggle('is-active')
@@ -31,7 +35,7 @@ export const NavBar = ({ token, setToken }) => {
       <div className="navbar-menu" ref={navbar}>
         <div className="navbar-start">
           {
-            token
+            user
               ?
               <Link to="/" className="navbar-item">Posts</Link>
               :
@@ -43,11 +47,17 @@ export const NavBar = ({ token, setToken }) => {
           <div className="navbar-item">
             <div className="buttons">
               {
-                token
+                user
                   ?
                   <button className="button is-outlined" onClick={() => {
-                    setToken('')
-                    navigate('/login')
+                    logoutUser().then((status, response) => {
+                      setUser(null)
+                      if (status !== 200) {
+                        console.error(response)
+                      }
+                      navigate('/login')
+                    })
+
                   }}>Logout</button>
                   :
                   <>

@@ -2,8 +2,9 @@ import { useRef } from "react"
 import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import { registerUser } from "../../managers/AuthManager"
+import { useCurrentUser } from "../../context/CurrentUserContext.js"
 
-export const Register = ({setToken}) => {
+export const Register = () => {
   const firstName = useRef()
   const lastName = useRef()
   const email = useRef()
@@ -13,6 +14,8 @@ export const Register = ({setToken}) => {
   const verifyPassword = useRef()
   const passwordDialog = useRef()
   const navigate = useNavigate()
+
+  const { setUser } = useCurrentUser()
 
   const handleRegister = (e) => {
     e.preventDefault()
@@ -28,12 +31,12 @@ export const Register = ({setToken}) => {
       }
 
       registerUser(newUser)
-        .then(res => {
-          if ("valid" in res && res.valid) {
-            setToken(res.token)
-            navigate("/")
-          }
-        })
+        .then(({status, response}) => {
+          if (status = 201) {
+              setUser(response)
+              navigate("/")
+              }
+            })
     } else {
       passwordDialog.current.showModal()
     }

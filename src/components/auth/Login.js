@@ -1,12 +1,15 @@
 import { useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { loginUser } from "../../managers/AuthManager"
+import { getCurrentUserInfo, loginUser } from "../../managers/AuthManager"
+import { useCurrentUser } from "../../context/CurrentUserContext.js"
 
-export const Login = ({ setToken }) => {
+export const Login = ({}) => {
   const username = useRef()
   const password = useRef()
   const navigate = useNavigate()
-  const [isUnsuccessful, setisUnsuccessful] = useState(false)
+  const [isUnsuccessful, setIsUnsuccessful] = useState(false)
+
+  const { setUser } = useCurrentUser()
 
   const handleLogin = (e) => {
     e.preventDefault()
@@ -16,13 +19,17 @@ export const Login = ({ setToken }) => {
       password: password.current.value
     }
 
-    loginUser(user).then(res => {
-      if ("valid" in res && res.valid) {
-        setToken(res.token)
+    loginUser(user).then((status, response) => {
+      if (status = 200) {
+        getCurrentUserInfo().then(({status, response}) => {
+          if (status === 200) {
+            setUser(response)
+          }
+        })
         navigate("/")
       }
       else {
-        setisUnsuccessful(true)
+        setIsUnsuccessful(true)
       }
     })
   }
