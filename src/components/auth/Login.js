@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { getCurrentUserInfo, loginUser } from "../../managers/AuthManager"
 import { useCurrentUser } from "../../context/CurrentUserContext.js"
@@ -31,7 +31,6 @@ export const Login = ({}) => {
         getCurrentUserInfo().then(({status, response}) => {
           if (status === 200) {
             setUser(response)
-            localStorage.setItem("has_session", "true")
           }
         })
         navigate("/")

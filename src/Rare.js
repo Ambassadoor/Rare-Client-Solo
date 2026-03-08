@@ -7,19 +7,16 @@ import { useNavigate } from "react-router-dom"
 
 export const Rare = () => {
   const [user, setUser] = useState(null)
-  const hadSession = localStorage.getItem("has_session")
 
   const navigate = useNavigate()
 
   useEffect(() => {
     getCurrentUserInfo().then(({status, response}) => {
       if (status === 200) {
-        localStorage.setItem("has_session", "true")
         setUser(response)
       } else {
-        localStorage.removeItem("has_session")
-        if (!hadSession) return
-        navigate("/login", {state: "Session expired, please login again"})
+        if (response.error === "no_token") return
+        navigate("/login", {state: response.message})
       }
     })
   },[])
